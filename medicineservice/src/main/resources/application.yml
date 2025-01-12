@@ -3,21 +3,24 @@ spring:
     name: medicine-service
 
   data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: ${MONGODB_DATABASE}
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
 
-  datasource:
-    url: ${DATASOURCE_URL}
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
-    show-sql: true
+    show-sql: false
 
 server:
   port: 8082
+
+logging:
+  level:
+    org.springframework: INFO

@@ -1,22 +1,20 @@
 package com.management.medicineservice.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-
-@Entity
+@Document(collection = "medicines")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Medicine {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     private String name;
     private String barcode;
     private String companyName;
     private String status;
 }
-

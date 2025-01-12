@@ -1,12 +1,8 @@
 package com.management.medicineservice.repository;
 
 import com.management.medicineservice.model.Medicine;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-
-import java.util.List;
-
-public interface MedicineRepository extends JpaRepository<Medicine, Long> {
-    List<Medicine> findByNameContainingIgnoreCase(String name);
+public interface MedicineRepository extends MongoRepository<Medicine, Long> {
 }
 
