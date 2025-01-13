@@ -42,6 +42,8 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AuthServiceImpl.class);
+
     @Override
     public ResponseEntity<Map<String, Object>> authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = performAuthentication(loginRequest);
@@ -86,6 +88,22 @@ public class AuthServiceImpl implements AuthService {
         return jwtUtils.getJwtFromCookies(request)
                 .map(jwtUtils::validateJwtToken)
                 .orElse(false);
+    }
+
+    @Override
+    public boolean validateToken(String token) {
+        if (!jwtUtils.validateJwtToken(token)) {
+            return false;
+        }
+
+        String userId = jwtUtils.getUserIdFromJwtToken(token);
+        boolean userExists = userRepository.existsById(Long.parseLong(userId));
+
+        if (!userExists) {
+            logger.error("Token validated but could not find:  User ID: {}", userId);
+        }
+
+        return userExists;
     }
 
     @Override

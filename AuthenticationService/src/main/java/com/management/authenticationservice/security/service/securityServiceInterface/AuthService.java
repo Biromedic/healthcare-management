@@ -21,4 +21,5 @@ public interface AuthService {
 
     boolean isAuthenticated(HttpServletRequest request);
 
+    boolean validateToken(String token);
 }

@@ -2,6 +2,7 @@ package com.management.authenticationservice.controller;
 
 import com.management.authenticationservice.security.request.LoginRequest;
 import com.management.authenticationservice.security.request.SignupRequest;
+import com.management.authenticationservice.security.request.TokenValidationRequest;
 import com.management.authenticationservice.security.response.MessageResponse;
 import com.management.authenticationservice.security.response.UserInfoResponse;
 import com.management.authenticationservice.security.service.securityServiceInterface.AuthService;
@@ -64,4 +65,11 @@ public class AuthController {
         boolean isAuthenticated = authService.isAuthenticated(request);
         return ResponseEntity.ok(Map.of("isAuthenticated", isAuthenticated));
     }
+
+    @PostMapping("/validate")
+    public ResponseEntity<?> validateToken(@RequestBody TokenValidationRequest request) {
+        boolean isValid = authService.validateToken(request.getToken());
+        return ResponseEntity.ok(Map.of("isValid", isValid));
+    }
+
 }

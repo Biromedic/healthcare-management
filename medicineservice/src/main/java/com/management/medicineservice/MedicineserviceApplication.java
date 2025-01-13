@@ -3,7 +3,7 @@ package com.management.medicineservice;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.management.medicineservice")
 public class MedicineserviceApplication {
 
     public static void main(String[] args) {

@@ -70,7 +70,7 @@ public class AuthConfig {
 
                         // Public Access (Authentication Endpoints)
                         .requestMatchers("/api/auth/v1/signup", "/api/auth/v1/signin").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "api/auth/v1/validate").permitAll()
 
                         // Authenticated Access (Private Endpoints)
                         .requestMatchers("/api/auth/v1/user",
