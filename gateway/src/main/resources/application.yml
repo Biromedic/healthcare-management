@@ -1,0 +1,26 @@
+server:
+  port: ${GATEWAY_PORT}
+
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin
+      routes:
+        - id: auth_service
+          uri: ${AUTH_SERVICE_URL}
+          predicates:
+            - Path=/auth/**
+        - id: pharmacy_service
+          uri: ${PHARMACY_SERVICE_URL}
+          predicates:
+            - Path=/api/pharmacies/v1/**
+          filters:
+            - JwtCookieFilter
+
+  frontend:
+    url: ${FRONTEND_URL}
+
+logging:
+  level:
+    org.springframework: INFO
