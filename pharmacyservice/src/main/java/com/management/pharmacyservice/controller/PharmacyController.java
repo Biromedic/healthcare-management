@@ -46,7 +46,7 @@ public class PharmacyController {
         return ResponseEntity.ok("Pharmacy deleted successfully");
     }
 
-    @GetMapping("/search-medicines")
+    @GetMapping("/search")
     public ResponseEntity<List<MedicineDTO>> searchMedicines(@RequestParam String query) {
         List<MedicineDTO> medicines = pharmacyService.searchMedicines(query);
         return ResponseEntity.ok(medicines);

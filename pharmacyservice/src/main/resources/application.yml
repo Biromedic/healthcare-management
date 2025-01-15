@@ -2,6 +2,17 @@ server:
   port: 8084
 
 spring:
+  application:
+    name: pharmacy-service
+  feign:
+    hystrix:
+      enabled: false
+  cloud:
+    loadbalancer:
+      retry:
+        enabled: true
+
+
   datasource:
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
@@ -9,7 +20,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
     show-sql: true

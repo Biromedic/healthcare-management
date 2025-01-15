@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-@FeignClient(name = "medicine-service", url = "http://localhost:8082/api/medicines/v1")
+@FeignClient(name = "medicine-service", url = "${MEDICINE_SERVICE_URL}")
 public interface MedicineServiceClient {
-    @GetMapping("/search")
+    @GetMapping("/api/medicines/v1/search")
     List<MedicineDTO> searchMedicines(@RequestParam("query") String query);
 }
