@@ -31,7 +31,7 @@ public class MedicineServiceImpl implements MedicineService {
     public void updateMedicineFromExcel() {
         try {
 
-            File file = new ClassPathResource("data/medicine_data.xlsx").getFile();
+            File file = new ClassPathResource("data/medicine_data_updated.xlsx").getFile();
             List<Medicine> medicines = excelHelper.readMedicinesFromExcel(file.getAbsolutePath());
 
             medicineRepository.saveAll(medicines);

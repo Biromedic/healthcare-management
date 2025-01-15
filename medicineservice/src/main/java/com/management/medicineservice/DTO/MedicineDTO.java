@@ -16,5 +16,6 @@ public class MedicineDTO implements Serializable {
     private String barcode;
     private String companyName;
     private String status;
+    private Integer price;
 }
 
