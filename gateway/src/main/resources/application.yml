@@ -2,6 +2,8 @@ server:
   port: ${GATEWAY_PORT}
 
 spring:
+  application:
+    name: gateway-service
   cloud:
     gateway:
       default-filters:
@@ -10,17 +12,26 @@ spring:
         - id: auth_service
           uri: ${AUTH_SERVICE_URL}
           predicates:
-            - Path=/auth/**
+            - Path=/api/auth/**
+          filters:
+            - RewritePath=/api/auth/(?<segment>.*), /api/auth/$\{segment}
         - id: pharmacy_service
           uri: ${PHARMACY_SERVICE_URL}
           predicates:
-            - Path=/api/pharmacies/v1/**
+            - Path=/api/pharmacies/**
           filters:
             - JwtCookieFilter
+            - RewritePath=/api/pharmacies/(?<segment>.*), /api/pharmacies/$\{segment}
+        - id: medicine_service
+          uri: ${MEDICINE_SERVICE_URL}
+          predicates:
+            - Path=/api/medicines/v1/**
+          filters:
+            - RewritePath=/api/medicines/(?<segment>.*), /api/medicines/$\{segment}
 
   frontend:
     url: ${FRONTEND_URL}
 
 logging:
   level:
-    org.springframework: INFO
+    org.springframework: debug

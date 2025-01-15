@@ -1,6 +1,7 @@
 package com.management.gateway.config;
 
 import com.management.gateway.filter.JwtCookieFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
+@RequiredArgsConstructor
 public class GatewayConfig {
 
     private final JwtCookieFilter jwtCookieFilter;
@@ -18,18 +20,19 @@ public class GatewayConfig {
     @Value("${PHARMACY_SERVICE_URL}")
     private String pharmacyServiceUrl;
 
-    public GatewayConfig(JwtCookieFilter jwtCookieFilter) {
-        this.jwtCookieFilter = jwtCookieFilter;
-    }
+    @Value("${MEDICINE_SERVICE_URL}")
+    private String medicineServiceUrl;
 
     @Bean
-    public RouteLocator routes(RouteLocatorBuilder builder) {
+    public RouteLocator routeLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("auth_service", r -> r.path("/auth/**")
+                .route("auth_service", r -> r.path("api/auth/**")
                         .uri(authServiceUrl))
-                .route("pharmacy_service", r -> r.path("/api/pharmacies/v1/**")
+                .route("pharmacy_service", r -> r.path("/api/pharmacies/**")
                         .filters(f -> f.filter(jwtCookieFilter.apply(new JwtCookieFilter.Config())))
                         .uri(pharmacyServiceUrl))
+                .route("medicine_service", r -> r.path("/api/medicines/**")
+                        .uri(medicineServiceUrl))
                 .build();
     }
 }
