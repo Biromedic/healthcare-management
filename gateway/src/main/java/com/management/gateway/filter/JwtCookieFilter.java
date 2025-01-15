@@ -15,14 +15,14 @@ import java.util.Map;
 @Component
 public class JwtCookieFilter extends AbstractGatewayFilterFactory<JwtCookieFilter.Config> {
 
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     @Value("${AUTH_SERVICE_URL}")
     private String authServiceUrl;
 
     public JwtCookieFilter(WebClient.Builder webClientBuilder) {
         super(Config.class);
-        this.webClient = webClientBuilder.baseUrl(authServiceUrl).build();
+        this.webClientBuilder = webClientBuilder;
     }
 
     @Override
@@ -34,7 +34,10 @@ public class JwtCookieFilter extends AbstractGatewayFilterFactory<JwtCookieFilte
                 return exchange.getResponse().setComplete();
             }
 
-            return webClient.post()
+            return webClientBuilder
+                    .baseUrl(authServiceUrl)
+                    .build()
+                    .post()
                     .uri("/api/auth/v1/validate")
                     .header("Content-Type", "application/json")
                     .bodyValue(Map.of("token", jwtCookie.getValue()))
