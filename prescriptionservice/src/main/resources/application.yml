@@ -6,6 +6,7 @@ spring:
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -13,8 +14,24 @@ spring:
       hibernate:
         format_sql: true
     show-sql: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
 server:
     port: 8083
+
+rabbitmq:
+  prescription:
+    exchange: ${RABBITMQ_PRESCRIPTION_EXCHANGE}
+    queue: ${RABBITMQ_PRESCRIPTION_QUEUE}
+    routing-key: ${RABBITMQ_PRESCRIPTION_ROUTING_KEY}
+
+logging:
+  level:
+    org.springframework: INFO
+    com.management.prescriptionservice: DEBUG
 
 

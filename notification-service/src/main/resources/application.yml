@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: notification-service
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+server:
+  port: 8085
+
+rabbitmq:
+  prescription:
+    queue: ${RABBITMQ_PRESCRIPTION_QUEUE}
+
+logging:
+  level:
+    org.springframework: INFO
+    com.management.notificationservice: DEBUG
