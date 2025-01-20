@@ -1,6 +1,6 @@
 package com.management.prescriptionservice.controller;
 
-import com.management.prescriptionservice.dto.PrescriptionRequestDTO;
+import com.management.prescriptionservice.dto.CreatePrescriptionRequestDTO;
 import com.management.prescriptionservice.dto.PrescriptionResponseDTO;
 import com.management.prescriptionservice.service.PrescriptionService;
 import lombok.RequiredArgsConstructor;
@@ -10,30 +10,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/prescriptions")
+@RequestMapping("/api/prescriptions/v1")
 @RequiredArgsConstructor
 public class PrescriptionController {
 
     private final PrescriptionService prescriptionService;
 
     @PostMapping
-    public ResponseEntity<PrescriptionResponseDTO> createPrescription(@RequestBody PrescriptionRequestDTO requestDTO) {
-        return ResponseEntity.ok(prescriptionService.createPrescription(requestDTO));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<PrescriptionResponseDTO> getPrescriptionById(@PathVariable Long id) {
-        return ResponseEntity.ok(prescriptionService.getPrescriptionById(id));
+    public ResponseEntity<PrescriptionResponseDTO> createPrescription(@RequestBody CreatePrescriptionRequestDTO request) {
+        PrescriptionResponseDTO response = prescriptionService.createPrescription(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
     public ResponseEntity<List<PrescriptionResponseDTO>> getAllPrescriptions() {
-        return ResponseEntity.ok(prescriptionService.getAllPrescriptions());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePrescription(@PathVariable Long id) {
-        prescriptionService.deletePrescription(id);
-        return ResponseEntity.ok("Prescription deleted successfully");
+        List<PrescriptionResponseDTO> responses = prescriptionService.getAllPrescriptions();
+        return ResponseEntity.ok(responses);
     }
 }

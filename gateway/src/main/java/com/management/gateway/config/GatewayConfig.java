@@ -23,6 +23,9 @@ public class GatewayConfig {
     @Value("${MEDICINE_SERVICE_URL}")
     private String medicineServiceUrl;
 
+    @Value("${PRESCRIPTION_SERVICE_URL}")
+    private String prescriptionServiceUrl;
+
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -33,6 +36,9 @@ public class GatewayConfig {
                         .uri(pharmacyServiceUrl))
                 .route("medicine_service", r -> r.path("/api/medicines/**")
                         .uri(medicineServiceUrl))
+                .route("prescription_service", r -> r.path("/api/prescriptions/**")
+                        .filters(f -> f.filter(jwtCookieFilter.apply(new JwtCookieFilter.Config())))
+                        .uri(prescriptionServiceUrl))
                 .build();
     }
 }
