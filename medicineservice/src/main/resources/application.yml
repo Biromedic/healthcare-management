@@ -1,6 +1,10 @@
 spring:
   application:
     name: medicine-service
+  task:
+    scheduling:
+      pool:
+        size: 10
 
   data:
     mongodb:
