@@ -6,6 +6,23 @@ spring:
     port: ${RABBITMQ_PORT}
     username: ${RABBITMQ_USERNAME}
     password: ${RABBITMQ_PASSWORD}
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+        mail:
+            smtp:
+            auth: true
+            starttls:
+                enable: true
+            ssl:
+                trust: "*"
+            connectiontimeout: 5000
+            timeout: 3000
+            writetimeout: 5000
 server:
   port: 8085
 
