@@ -9,12 +9,13 @@ import com.management.prescriptionservice.repository.PrescriptionRepository;
 import com.management.prescriptionservice.service.PrescriptionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,9 +53,8 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     }
 
     @Override
-    public List<PrescriptionResponseDTO> getAllPrescriptions() {
-        return prescriptionRepository.findAll()
-                .stream().map(prescription -> modelMapper.map(prescription, PrescriptionResponseDTO.class))
-                .collect(Collectors.toList());
+    public Page<PrescriptionResponseDTO> getAllPrescriptions(Pageable pageable) {
+        return prescriptionRepository.findAll(pageable)
+                .map(prescription -> modelMapper.map(prescription, PrescriptionResponseDTO.class));
     }
 }
