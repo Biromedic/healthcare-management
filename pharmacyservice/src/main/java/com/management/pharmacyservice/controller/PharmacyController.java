@@ -29,7 +29,6 @@ public class PharmacyController {
         return ResponseEntity.ok("Prescription processed successfully.");
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<PharmacyResponseDTO> getPharmacyById(@PathVariable Long id) {
         return ResponseEntity.ok(pharmacyService.getPharmacyById(id));

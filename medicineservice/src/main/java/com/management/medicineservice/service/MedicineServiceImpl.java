@@ -26,12 +26,13 @@ public class MedicineServiceImpl implements MedicineService {
     private final ModelMapper modelMapper;
 
     private static final String MEDICINE_CACHE_KEY = "ALL_MEDICINES";
+    private static final String EXCEL_FILE_PATH = "data/medicine_data_updated.xlsx";
 
     @Override
     public void updateMedicineFromExcel() {
         try {
 
-            File file = new ClassPathResource("data/medicine_data_updated.xlsx").getFile();
+            File file = new ClassPathResource(EXCEL_FILE_PATH).getFile();
             List<Medicine> medicines = excelHelper.readMedicinesFromExcel(file.getAbsolutePath());
 
             medicineRepository.saveAll(medicines);
