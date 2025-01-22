@@ -1,6 +1,7 @@
 package com.management.gateway.config;
 
 import com.management.gateway.filter.JwtCookieFilter;
+import com.management.gateway.filter.LoggingGatewayFilterFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -29,16 +30,22 @@ public class GatewayConfig {
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("auth_service", r -> r.path("api/auth/**")
+                .route("auth_service", r -> r.path("/api/auth/**")
+                        .filters(f -> f.filter(new LoggingGatewayFilterFactory().apply(new LoggingGatewayFilterFactory.Config()))
+                                .filter(jwtCookieFilter.apply(new JwtCookieFilter.Config())))
                         .uri(authServiceUrl))
                 .route("pharmacy_service", r -> r.path("/api/pharmacies/**")
-                        .filters(f -> f.filter(jwtCookieFilter.apply(new JwtCookieFilter.Config())))
+                        .filters(f -> f.filter(new LoggingGatewayFilterFactory().apply(new LoggingGatewayFilterFactory.Config()))
+                                .filter(jwtCookieFilter.apply(new JwtCookieFilter.Config())))
                         .uri(pharmacyServiceUrl))
                 .route("medicine_service", r -> r.path("/api/medicines/**")
+                        .filters(f -> f.filter(new LoggingGatewayFilterFactory().apply(new LoggingGatewayFilterFactory.Config())))
                         .uri(medicineServiceUrl))
                 .route("prescription_service", r -> r.path("/api/prescriptions/**")
-                        .filters(f -> f.filter(jwtCookieFilter.apply(new JwtCookieFilter.Config())))
+                        .filters(f -> f.filter(new LoggingGatewayFilterFactory().apply(new LoggingGatewayFilterFactory.Config()))
+                                .filter(jwtCookieFilter.apply(new JwtCookieFilter.Config())))
                         .uri(prescriptionServiceUrl))
                 .build();
     }
+
 }
