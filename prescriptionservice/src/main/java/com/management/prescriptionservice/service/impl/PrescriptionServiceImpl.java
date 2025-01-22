@@ -7,12 +7,15 @@ import com.management.prescriptionservice.event.PrescriptionEventPublisher;
 import com.management.prescriptionservice.model.Prescription;
 import com.management.prescriptionservice.repository.PrescriptionRepository;
 import com.management.prescriptionservice.service.PrescriptionService;
+import com.management.prescriptionservice.service.TCValidationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.time.LocalDateTime;
@@ -24,10 +27,17 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     private final PrescriptionRepository prescriptionRepository;
     private final ModelMapper modelMapper;
     private final PrescriptionEventPublisher eventPublisher;
+    private final TCValidationService tcValidationService;
 
     @Override
     @Transactional
     public PrescriptionResponseDTO createPrescription(CreatePrescriptionRequestDTO request) {
+
+        boolean isTcValid = tcValidationService.validateTcNumber(request.getPatientId().toString());
+        if (!isTcValid) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid TC number provided.");
+        }
+
         Prescription prescription = Prescription.builder()
                 .doctorId(request.getDoctorId())
                 .patientId(request.getPatientId())
@@ -40,7 +50,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         // Create and publish the event
         PrescriptionEvent event = PrescriptionEvent.builder()
                 .prescriptionId(prescription.getId().toString())
-                .patientName("Patient ID: " + prescription.getPatientId()) // You might want to fetch actual names from a user service
+                .patientName("Patient ID: " + prescription.getPatientId())
                 .doctorName("Doctor ID: " + prescription.getDoctorId())
                 .createdAt(prescription.getIssuedAt())
                 .status("CREATED")

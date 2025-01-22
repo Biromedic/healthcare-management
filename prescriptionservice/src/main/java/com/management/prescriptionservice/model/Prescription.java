@@ -27,4 +27,8 @@ public class Prescription {
 
     @Column(nullable = false)
     private LocalDateTime issuedAt;
+
+    private boolean isComplete;
+
+    private String missingDetails;
 }

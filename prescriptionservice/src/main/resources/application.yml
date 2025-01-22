@@ -34,4 +34,6 @@ logging:
     org.springframework: INFO
     com.management.prescriptionservice: DEBUG
 
-
+tc:
+  validation:
+    url: ${TC_VALIDATION_URL}
