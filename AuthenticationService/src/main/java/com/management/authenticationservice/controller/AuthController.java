@@ -9,7 +9,6 @@ import com.management.authenticationservice.security.service.securityServiceInte
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -59,17 +58,10 @@ public class AuthController {
         return authService.signoutUser();
     }
 
-    @Operation(summary = "Check if the user is authenticated")
-    @GetMapping("/check")
-    public ResponseEntity<?> checkAuth(HttpServletRequest request) {
-        boolean isAuthenticated = authService.isAuthenticated(request);
-        return ResponseEntity.ok(Map.of("isAuthenticated", isAuthenticated));
-    }
-
+    @Operation(summary = "Validate token")
     @PostMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestBody TokenValidationRequest request) {
         boolean isValid = authService.validateToken(request.getToken());
         return ResponseEntity.ok(Map.of("isValid", isValid));
     }
-
 }

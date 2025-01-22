@@ -15,7 +15,6 @@ import com.management.authenticationservice.security.response.UserInfoResponse;
 import com.management.authenticationservice.security.service.UserDetailsImpl;
 import com.management.authenticationservice.security.service.securityServiceInterface.AuthService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -81,13 +80,6 @@ public class AuthServiceImpl implements AuthService {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
-    }
-
-    @Override
-    public boolean isAuthenticated(HttpServletRequest request) {
-        return jwtUtils.getJwtFromCookies(request)
-                .map(jwtUtils::validateJwtToken)
-                .orElse(false);
     }
 
     @Override

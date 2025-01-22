@@ -74,8 +74,7 @@ public class AuthConfig {
 
                         // Authenticated Access (Private Endpoints)
                         .requestMatchers("/api/auth/v1/user",
-                                "/api/auth/v1/sign-out",
-                                "/api/auth/v1/check").authenticated()
+                                "/api/auth/v1/sign-out").authenticated()
 
                         // All other requests must be denied (default policy)
                         .anyRequest().denyAll()

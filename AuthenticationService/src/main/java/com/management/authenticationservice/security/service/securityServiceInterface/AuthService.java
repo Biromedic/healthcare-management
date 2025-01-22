@@ -4,7 +4,6 @@ import com.management.authenticationservice.security.request.LoginRequest;
 import com.management.authenticationservice.security.request.SignupRequest;
 import com.management.authenticationservice.security.response.MessageResponse;
 import com.management.authenticationservice.security.response.UserInfoResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
@@ -18,8 +17,6 @@ public interface AuthService {
     ResponseEntity<MessageResponse> signoutUser();
 
     ResponseEntity<UserInfoResponse> getUserDetails(Authentication authentication);
-
-    boolean isAuthenticated(HttpServletRequest request);
 
     boolean validateToken(String token);
 }
