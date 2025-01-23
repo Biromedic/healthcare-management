@@ -58,8 +58,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
     private String parseJwt(HttpServletRequest request) {
-        final String jwt = jwtUtils.getJwtFromCookies(request).orElse(null);
-        logger.debug("Parsed JWT from request: {}", jwt);
-        return jwt;
+        String headerAuth = request.getHeader("Authorization");
+        if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
+            return headerAuth.substring(7);
+        }
+        return null;
     }
 }

@@ -60,8 +60,8 @@ public class AuthController {
 
     @Operation(summary = "Validate token")
     @PostMapping("/validate")
-    public ResponseEntity<?> validateToken(@RequestBody TokenValidationRequest request) {
-        boolean isValid = authService.validateToken(request.getToken());
-        return ResponseEntity.ok(Map.of("isValid", isValid));
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        return authService.validateToken(token);
     }
 }

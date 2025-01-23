@@ -18,5 +18,5 @@ public interface AuthService {
 
     ResponseEntity<UserInfoResponse> getUserDetails(Authentication authentication);
 
-    boolean validateToken(String token);
+    ResponseEntity<?> validateToken(String token);
 }

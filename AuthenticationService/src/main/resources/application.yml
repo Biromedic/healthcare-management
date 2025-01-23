@@ -4,9 +4,6 @@ spring:
   app:
     jwtSecret: ${JWT_SECRET}
     jwtExpirationMs: ${JWT_EXPIRATION_MS}
-  ecom:
-    app:
-      jwtCookieName: jwtCookie
   datasource:
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}

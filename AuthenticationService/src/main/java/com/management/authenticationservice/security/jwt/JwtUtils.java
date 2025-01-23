@@ -1,24 +1,19 @@
 package com.management.authenticationservice.security.jwt;
 
 import com.management.authenticationservice.model.Role;
-import com.management.authenticationservice.model.enums.AppRole;
-import com.management.authenticationservice.security.service.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtils {
@@ -30,38 +25,6 @@ public class JwtUtils {
 
     @Value("${spring.app.jwtExpirationMs}")
     private int jwtExpirationMs;
-
-    @Value("${spring.ecom.app.jwtCookieName}")
-    private String jwtCookieName;
-
-    public Optional<String> getJwtFromCookies(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
-        return cookie != null ? Optional.of(cookie.getValue()) : Optional.empty();
-    }
-
-    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
-        List<Role> userRoles = userPrincipal.getAuthorities().stream()
-                .map(grantedAuthority -> new Role(AppRole.valueOf(grantedAuthority.getAuthority())))
-                .toList();
-        String jwt = generateTokenFromEmail(userPrincipal.getEmail(), userPrincipal.getId(), userRoles);
-        return ResponseCookie.from(jwtCookieName, jwt)
-                .path("/api")
-                .maxAge(jwtExpirationMs / 1000)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
-                .build();
-    }
-
-    public ResponseCookie getCleanJwtCookie() {
-        return ResponseCookie.from(jwtCookieName, "")
-                .path("/api")
-                .maxAge(0)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
-                .build();
-    }
 
     public String generateTokenFromEmail(String email, Long userId, List<Role> roles) {
         return Jwts.builder()
@@ -81,6 +44,19 @@ public class JwtUtils {
                 .parseClaimsJws(token)
                 .getBody()
                 .get("email", String.class);
+    }
+
+    public List<String> getRolesFromJwtToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        List<Map<String, String>> rolesList = (List<Map<String, String>>) claims.get("roles");
+        return rolesList.stream()
+                .map(role -> role.get("roleName"))
+                .collect(Collectors.toList());
     }
 
     public boolean validateJwtToken(String authToken) {

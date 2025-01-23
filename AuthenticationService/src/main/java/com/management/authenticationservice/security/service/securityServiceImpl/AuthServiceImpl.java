@@ -16,9 +16,7 @@ import com.management.authenticationservice.security.service.UserDetailsImpl;
 import com.management.authenticationservice.security.service.securityServiceInterface.AuthService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -41,23 +39,29 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder encoder;
 
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AuthServiceImpl.class);
-
     @Override
     public ResponseEntity<Map<String, Object>> authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = performAuthentication(loginRequest);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        String jwtToken = jwtUtils.generateTokenFromEmail(
+                userDetails.getEmail(),
+                userDetails.getId(),
+                userDetails.getAuthorities().stream()
+                        .map(auth -> new Role(AppRole.valueOf(auth.getAuthority())))
+                        .toList()
+        );
 
         List<String> roles = extractRoles(userDetails);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(Map.of("userInfo", new UserInfoResponse(
-                        userDetails.getId(),
-                        userDetails.getEmail(),
-                        roles,
-                        jwtCookie.toString())));
+                .body(Map.of(
+                        "token", jwtToken,
+                        "userInfo", new UserInfoResponse(
+                                userDetails.getId(),
+                                userDetails.getEmail(),
+                                roles
+                        )
+                ));
     }
 
     @Override
@@ -76,26 +80,18 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public ResponseEntity<MessageResponse> signoutUser() {
         SecurityContextHolder.clearContext();
-        ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new MessageResponse("You've been signed out!"));
+        return ResponseEntity.ok(new MessageResponse("You've been signed out!"));
     }
 
     @Override
-    public boolean validateToken(String token) {
+    public ResponseEntity<?> validateToken(String token) {
         if (!jwtUtils.validateJwtToken(token)) {
-            return false;
+            return ResponseEntity.ok(Map.of("isValid", false));
         }
 
-        String userId = jwtUtils.getUserIdFromJwtToken(token);
-        boolean userExists = userRepository.existsById(Long.parseLong(userId));
-
-        if (!userExists) {
-            logger.error("Token validated but could not find:  User ID: {}", userId);
-        }
-
-        return userExists;
+        Long userId = Long.parseLong(jwtUtils.getUserIdFromJwtToken(token));
+        List<String> roles = jwtUtils.getRolesFromJwtToken(token);
+        return ResponseEntity.ok(Map.of("isValid", true, "userId", userId, "roles", roles));
     }
 
     @Override
