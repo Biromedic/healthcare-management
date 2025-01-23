@@ -4,42 +4,77 @@ server:
 
 spring:
   application:
-    name: gateway-service
+      name: gateway
   cloud:
     gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
       default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
       routes:
-        - id: auth_service
+        - id: auth-service
           uri: ${AUTH_SERVICE_URL}
           predicates:
-            - Path=/api/auth/**
+            - Path=/api/auth/v1/**
           filters:
-            - RewritePath=/api/auth/(?<segment>.*), /api/auth/$\{segment}
-        - id: pharmacy_service
-          uri: ${PHARMACY_SERVICE_URL}
-          predicates:
-            - Path=/api/pharmacies/**
-          filters:
-            - JwtCookieFilter
-            - RewritePath=/api/pharmacies/(?<segment>.*), /api/pharmacies/$\{segment}
-        - id: medicine_service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@remoteAddressKeyResolver}"
+
+        - id: medicine-service-search
           uri: ${MEDICINE_SERVICE_URL}
           predicates:
-            - Path=/api/medicines/v1/**
-          filters:
-            - RewritePath=/api/medicines/(?<segment>.*), /api/medicines/$\{segment}
-        - id: prescription_service
-          uri: ${PRESCRIPTION_SERVICE_URL}
+            - Path=/api/medicines/v1/search
+
+        - id: medicine-service-admin
+          uri: ${MEDICINE_SERVICE_URL}
           predicates:
-              - Path=/api/prescriptions/**
+            - Path=/api/medicines/v1/upload, /api/medicines/v1/cache
           filters:
-              - JwtCookieFilter
-              - RewritePath=/api/prescriptions/(?<segment>.*), /api/prescriptions/$\{segment}
+            - name: AddRequestHeader
+              args:
+                name: X-User-Roles
+                value: ADMIN
+            - name: CircuitBreaker
+              args:
+                name: medicineServiceCircuitBreaker
+                fallbackUri: forward:/fallback/medicine-service
 
-  frontend:
-    url: ${FRONTEND_URL}
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 5s
 
-logging:
-  level:
-    org.springframework: debug
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      medicineServiceCircuitBreaker:
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 10s
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  auth-header: ${AUTH_HEADER}
+  bearer-prefix: ${BEARER_PREFIX}
+  validate-endpoint: ${VALIDATE_ENDPOINT}
