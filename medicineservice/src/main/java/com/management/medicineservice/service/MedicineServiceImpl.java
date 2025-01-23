@@ -6,6 +6,7 @@ import com.management.medicineservice.model.Medicine;
 import com.management.medicineservice.repository.MedicineRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -58,6 +59,7 @@ public class MedicineServiceImpl implements MedicineService {
     }
 
     @Override
+    @Cacheable(value = "medicineNames", key = "#query")
     public List<MedicineDTO> searchMedicines(String query) {
         List<MedicineDTO> cachedMedicines = redisTemplate.opsForValue().get(MEDICINE_CACHE_KEY);
         if (cachedMedicines == null) {

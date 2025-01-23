@@ -37,10 +37,7 @@ public class ExcelHelper {
                     if (row != null) {
                         Medicine medicine = new Medicine();
                         medicine.setName(getCellValue(row, 0));
-                        medicine.setBarcode(getCellValue(row, 1));
-                        medicine.setCompanyName(getCellValue(row, 4));
-                        medicine.setStatus(getCellValue(row, 6));
-                        medicine.setPrice(Integer.parseInt(getCellValue(row, 5)));
+                        medicine.setPrice(Integer.parseInt(getCellValue(row, 7)));
                         medicines.add(medicine);
                     }
                 }
