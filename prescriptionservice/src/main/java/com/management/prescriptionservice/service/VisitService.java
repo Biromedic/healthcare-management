@@ -1,11 +1,9 @@
 package com.management.prescriptionservice.service;
 
-import com.management.prescriptionservice.dto.CreateVisitRequestDTO;
-import com.management.prescriptionservice.dto.VisitResponseDTO;
-
-import java.util.List;
+import com.management.prescriptionservice.dto.VisitDTO;
+import com.management.prescriptionservice.model.Visit;
 
 public interface VisitService {
-    VisitResponseDTO createVisit(CreateVisitRequestDTO request);
-    List<VisitResponseDTO> getAllVisits();
+    Visit createVisit(String doctorId, String patientTC);
+    VisitDTO getVisitDetails(Long visitId);
 }

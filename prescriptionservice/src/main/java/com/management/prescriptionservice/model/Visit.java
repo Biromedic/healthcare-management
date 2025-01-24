@@ -1,16 +1,14 @@
 package com.management.prescriptionservice.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Visit {
 
     @Id
@@ -18,15 +16,15 @@ public class Visit {
     private Long id;
 
     @Column(nullable = false)
-    private Long doctorId;
+    private String doctorId;
 
     @Column(nullable = false)
-    private Long patientId;
+    private String patientTC;
 
     @Column(nullable = false)
-    private LocalDateTime visitDate;
+    private LocalDateTime visitDateTime;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "prescription_id", referencedColumnName = "id")
+    @OneToOne
+    @JoinColumn(name = "prescription_id")
     private Prescription prescription;
 }
