@@ -27,6 +27,18 @@ spring:
                 redis-rate-limiter.burstCapacity: 20
                 key-resolver: "#{@remoteAddressKeyResolver}"
 
+        - id: prescription-service
+          uri: ${PRESCRIPTION_SERVICE_URL}
+          predicates:
+            - Path=/api/prescriptions/v1/**
+          filters:
+            - JwtValidation
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                key-resolver: "#{@remoteAddressKeyResolver}"
+
         - id: medicine-service-search
           uri: ${MEDICINE_SERVICE_URL}
           predicates:

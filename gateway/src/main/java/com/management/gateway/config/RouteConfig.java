@@ -15,6 +15,9 @@ public class RouteConfig {
     @Value("${medicine-service-url}")
     private String medicineServiceUrl;
 
+    @Value("${prescription-service-url}")
+    private String prescriptionServiceUrl;
+
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -25,6 +28,9 @@ public class RouteConfig {
                 .route("medicine_service_route", r -> r
                         .path("api/medicines/v1/**")
                         .uri(medicineServiceUrl))
+                .route("prescription_service_route", r -> r
+                        .path("api/prescriptions/v1/**")
+                        .uri(prescriptionServiceUrl))
                 .build();
     }
 } 
