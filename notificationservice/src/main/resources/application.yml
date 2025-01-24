@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: notification-service
+  rabbitmq:
+    template:
+      default-receive-queue: prescription-queue
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        missing-queues-fatal: false
+server:
+  port: 8084
