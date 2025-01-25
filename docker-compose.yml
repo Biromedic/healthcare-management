@@ -1,0 +1,224 @@
+services:
+  # PostgreSQL databases
+  auth-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${AUTH_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - auth-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${AUTH_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend-network
+
+  prescription-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${PRESCRIPTION_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - prescription-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${PRESCRIPTION_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend-network
+
+  # MongoDB for medicine service
+  medicine-db:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: medicine_db_4458
+    volumes:
+      - medicine-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - backend-network
+
+  # Redis for caching
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - backend-network
+
+  # RabbitMQ for messaging
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend-network
+
+  # Microservices
+  auth-service:
+    build: ./AuthenticationService
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/${AUTH_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
+      FRONTEND_URL: ${FRONTEND_URL}
+      SERVER_PORT: 8081
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,info"
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW-DETAILS: "always"
+      SERVER_ADDRESS: "0.0.0.0"
+    ports:
+      - "8081:8081"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "docker-compose up -d http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - backend-network
+
+  medicine-service:
+    build: ./medicineservice
+    environment:
+      MONGODB_URI: mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@medicine-db:27017
+      MONGODB_DATABASE: medicine_db_4458
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SERVER_PORT: 8082
+      SERVER_ADDRESS: "0.0.0.0"
+    ports:
+      - "8082:8082"
+    depends_on:
+      - medicine-db
+      - redis
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  prescription-service:
+    build: ./prescriptionservice
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://prescription-db:5432/${PRESCRIPTION_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      TC_VALIDATION_URL: ${TC_VALIDATION_URL}
+      SERVER_PORT: 8083
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SERVER_ADDRESS: "0.0.0.0"
+    ports:
+      - "8083:8083"
+    depends_on:
+      - prescription-db
+      - rabbitmq
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  notification-service:
+    build: ./notificationservice
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      SERVER_PORT: 8084
+      SERVER_ADDRESS: "0.0.0.0"
+    ports:
+      - "8084:8084"
+    depends_on:
+      - rabbitmq
+    networks:
+      - backend-network
+
+  gateway:
+    build: ./gateway
+    environment:
+      SERVER_PORT: 8080
+      AUTH_SERVICE_URL: http://auth-service:8081
+      MEDICINE_SERVICE_URL: http://medicine-service:8082
+      PRESCRIPTION_SERVICE_URL: http://prescription-service:8083
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+      AUTH_HEADER: ${AUTH_HEADER}
+      BEARER_PREFIX: ${BEARER_PREFIX}
+      VALIDATE_ENDPOINT: ${VALIDATE_ENDPOINT}
+      FRONTEND_URL: ${FRONTEND_URL}
+      SERVER_ADDRESS: "0.0.0.0"
+    ports:
+      - "8080:8080"
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      medicine-service:
+        condition: service_started
+      prescription-service:
+        condition: service_started
+      redis:
+        condition: service_started
+    networks:
+      - backend-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - auth-db
+      - prescription-db
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  auth-data:
+  prescription-data:
+  medicine-data:
+  pgadmin-data: 
