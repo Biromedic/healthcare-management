@@ -97,20 +97,19 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <!-- Skip repackaging the main JAR -->
-                    <skip>true</skip>
-                    <classifier>exec</classifier>
-                    <attach>true</attach>
+                    <mainClass>com.management.prescriptionservice.PrescriptionserviceApplication</mainClass>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
-                        <configuration>
-                            <!-- Attach the executable JAR -->
-                            <skip>false</skip>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
