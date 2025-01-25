@@ -1,34 +1,45 @@
 package com.management.prescriptionservice.model;
 
+import com.management.prescriptionservice.model.enums.PrescriptionStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
+@Table(name = "prescriptions")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Prescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long doctorId;
+    @Column(name = "doctor_user_id", nullable = false)
+    private String doctorUserId; // From Auth Service
+
+    @Column(name = "pharmacy_user_id")
+    private String pharmacyUserId; // From Auth Service
 
     @Column(nullable = false)
-    private Long patientId;
+    private String patientTC; // Mocked TC lookup
 
-    @Column(nullable = false)
-    private String medicationDetails;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
-    private LocalDateTime issuedAt;
+    @ElementCollection
+    @CollectionTable(name = "prescription_medicines", joinColumns = @JoinColumn(name = "prescription_id"))
+    private List<MedicineItem> medicines;
 
-    private boolean isComplete;
+    @Enumerated(EnumType.STRING)
+    private PrescriptionStatus status = PrescriptionStatus.CREATED;
 
-    private String missingDetails;
+    // Other fields: createdAt, updatedAt
 }
+
