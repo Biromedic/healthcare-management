@@ -1,7 +1,16 @@
 spring:
+  rabbitmq:
+    template:
+      default-receive-queue: prescription-queue
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        missing-queues-fatal: false
   application:
     name: prescription-service
-
   datasource:
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
@@ -12,28 +21,14 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: true
-  rabbitmq:
-    host: ${RABBITMQ_HOST}
-    port: ${RABBITMQ_PORT}
-    username: ${RABBITMQ_USERNAME}
-    password: ${RABBITMQ_PASSWORD}
 
+frontend:
+  url: ${FRONTEND_URL}
 server:
-    port: 8083
+  address: 127.0.0.1
+  port: 8083
 
-rabbitmq:
-  prescription:
-    exchange: ${RABBITMQ_PRESCRIPTION_EXCHANGE}
-    queue: ${RABBITMQ_PRESCRIPTION_QUEUE}
-    routing-key: ${RABBITMQ_PRESCRIPTION_ROUTING_KEY}
-
-logging:
-  level:
-    org.springframework: INFO
-    com.management.prescriptionservice: DEBUG
-
-tc:
-  validation:
-    url: ${TC_VALIDATION_URL}
+tc-validation-url: ${TC_VALIDATION_URL}
