@@ -12,8 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,24 +26,27 @@ public class MedicineServiceImpl implements MedicineService {
     private final ModelMapper modelMapper;
 
     private static final String MEDICINE_CACHE_KEY = "ALL_MEDICINES";
-    private static final String EXCEL_FILE_PATH = "data/medicine_data_updated.xlsx";
 
     @Override
     public void updateMedicineFromExcel() {
         try {
-
-            File file = new ClassPathResource(EXCEL_FILE_PATH).getFile();
-            List<Medicine> medicines = excelHelper.readMedicinesFromExcel(file.getAbsolutePath());
+            ClassPathResource resource = new ClassPathResource("data/medicine_data_updated.xlsx");
+            if (!resource.exists()) {
+                throw new RuntimeException("Excel file not found in classpath: " + resource.getPath());
+            }
+            InputStream inputStream = resource.getInputStream();
+            List<Medicine> medicines = excelHelper.readMedicinesFromExcel(inputStream);
 
             medicineRepository.saveAll(medicines);
 
             List<MedicineDTO> medicineDTOs = medicines.stream()
                     .map(medicine -> modelMapper.map(medicine, MedicineDTO.class))
                     .collect(Collectors.toList());
+
             redisTemplate.opsForValue().set(MEDICINE_CACHE_KEY, medicineDTOs);
 
-        } catch (IOException e) {
-            throw new RuntimeException("Excel file not found in resources/data folder", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error processing Excel file: " + e.getMessage());
         }
     }
 
