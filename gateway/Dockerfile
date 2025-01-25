@@ -5,7 +5,7 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy Maven build output (jar file) into the container
-COPY gateway-0.0.1-SNAPSHOT.jar app.jar
+COPY target/gateway-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the port that the application runs on
 EXPOSE 8080

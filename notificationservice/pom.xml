@@ -8,7 +8,7 @@
         <version>3.4.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.Management</groupId>
+    <groupId>com.management</groupId>
     <artifactId>notificationservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>notificationservice</name>
@@ -55,7 +55,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.Management</groupId>
+            <groupId>com.management</groupId>
             <artifactId>prescriptionservice</artifactId>
             <version>0.0.1-SNAPSHOT</version> <!-- Shared model classes -->
             <exclusions>

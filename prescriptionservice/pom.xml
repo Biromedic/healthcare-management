@@ -8,7 +8,7 @@
         <version>3.4.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.Management</groupId>
+    <groupId>com.management</groupId>
     <artifactId>prescriptionservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>prescriptionservice</name>
@@ -97,15 +97,23 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                    <!-- Skip repackaging the main JAR -->
+                    <skip>true</skip>
+                    <classifier>exec</classifier>
+                    <attach>true</attach>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Attach the executable JAR -->
+                            <skip>false</skip>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>
