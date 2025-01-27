@@ -12,7 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MedicineItem {
+    private String medicineId;
     private String medicineName;
     private Integer quantity;
-    private Double price;
+    private Integer price;
 }

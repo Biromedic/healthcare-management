@@ -31,4 +31,9 @@ public class MedicineController {
         medicineService.cacheAllMedicines();
         return ResponseEntity.ok("All medicines cached in Redis.");
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MedicineDTO> getMedicineById(@PathVariable String id) {
+        return ResponseEntity.ok(medicineService.getMedicineById(id));
+    }
 }

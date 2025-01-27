@@ -14,8 +14,5 @@ public class Medicine {
     private String id;
 
     private String name;
-    private String barcode;
-    private String companyName;
-    private String status;
     private Integer price;
 }

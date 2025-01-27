@@ -50,6 +50,11 @@ spring:
           predicates:
             - Path=/api/medicines/v1/search
 
+        - id: medicine-service-get-medicine
+          uri: ${MEDICINE_SERVICE_URL}
+          predicates:
+            - Path=/api/medicines/v1/{id}
+
         - id: medicine-service-admin
           uri: ${MEDICINE_SERVICE_URL}
           predicates:

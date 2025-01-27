@@ -79,4 +79,11 @@ public class MedicineServiceImpl implements MedicineService {
     public void updateMedicineList() {
         updateMedicineFromExcel();
     }
+
+    @Override
+    public MedicineDTO getMedicineById(String id) {
+        Medicine medicine = medicineRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Medicine not found with ID: " + id));
+        return modelMapper.map(medicine, MedicineDTO.class);
+    }
 }

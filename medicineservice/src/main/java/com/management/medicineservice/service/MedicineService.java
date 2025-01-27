@@ -12,4 +12,6 @@ public interface MedicineService {
     List<MedicineDTO> searchMedicines(String query);
 
     void updateMedicineList();
+
+    MedicineDTO getMedicineById(String id);
 }
