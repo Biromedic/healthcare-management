@@ -1,15 +1,15 @@
 package com.management.medicineservice.service;
 
 import com.management.medicineservice.DTO.MedicineDTO;
+import org.springframework.data.domain.Page;
 
-import java.util.List;
 
 public interface MedicineService {
     void updateMedicineFromExcel();
 
     void cacheAllMedicines();
 
-    List<MedicineDTO> searchMedicines(String query);
+    Page<MedicineDTO> searchMedicines(String query, int page, int size);
 
     void updateMedicineList();
 

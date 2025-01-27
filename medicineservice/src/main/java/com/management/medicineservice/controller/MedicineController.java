@@ -3,10 +3,10 @@ package com.management.medicineservice.controller;
 import com.management.medicineservice.DTO.MedicineDTO;
 import com.management.medicineservice.service.MedicineService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/medicines/v1")
@@ -16,8 +16,13 @@ public class MedicineController {
     private final MedicineService medicineService;
 
     @GetMapping("/search")
-    public ResponseEntity<List<MedicineDTO>> searchMedicines(@RequestParam String query) {
-        return ResponseEntity.ok(medicineService.searchMedicines(query));
+    public ResponseEntity<Page<MedicineDTO>> searchMedicines(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Page<MedicineDTO> resultPage = medicineService.searchMedicines(query, page, size);
+        return ResponseEntity.ok(resultPage);
     }
 
     @PostMapping("/upload")

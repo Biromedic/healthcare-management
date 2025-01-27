@@ -6,8 +6,10 @@ import com.management.medicineservice.model.Medicine;
 import com.management.medicineservice.repository.MedicineRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -61,17 +63,12 @@ public class MedicineServiceImpl implements MedicineService {
     }
 
     @Override
-    @Cacheable(value = "medicineNames", key = "#query")
-    public List<MedicineDTO> searchMedicines(String query) {
-        List<MedicineDTO> cachedMedicines = redisTemplate.opsForValue().get(MEDICINE_CACHE_KEY);
-        if (cachedMedicines == null) {
-            cacheAllMedicines();
-            cachedMedicines = redisTemplate.opsForValue().get(MEDICINE_CACHE_KEY);
-        }
-        assert cachedMedicines != null;
-        return cachedMedicines.stream()
-                .filter(medicine -> medicine.getName().toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
+    public Page<MedicineDTO> searchMedicines(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Medicine> medicinePage = medicineRepository.findByNameContainingIgnoreCase(query, pageable);
+
+        return medicinePage.map(medicine -> modelMapper.map(medicine, MedicineDTO.class));
     }
 
     @Override
