@@ -99,11 +99,12 @@ public class JwtAuthFilter implements GlobalFilter {
 
     private boolean isPublicEndpoint(String path) {
 
-        System.out.println("Checking path: " + path); // Add this line for debugging
+        System.out.println("Checking path: " + path);
         return path.startsWith("/api/auth/v1/signin") ||
                 path.startsWith("/api/auth/v1/signup") ||
                 path.startsWith("/api/auth/v1/validate") ||
                 path.startsWith("/api/medicines/v1/search") ||
+                path.startsWith("/api/medicines/v1/{id}") ||
                 path.startsWith("/actuator/health");
     }
 
