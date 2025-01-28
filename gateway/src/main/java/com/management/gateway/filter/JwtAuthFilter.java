@@ -104,7 +104,7 @@ public class JwtAuthFilter implements GlobalFilter {
                 path.startsWith("/api/auth/v1/signup") ||
                 path.startsWith("/api/auth/v1/validate") ||
                 path.startsWith("/api/medicines/v1/search") ||
-                path.startsWith("/api/medicines/v1/{id}") ||
+                path.startsWith("/api/medicines/v1/") ||
                 path.startsWith("/actuator/health");
     }
 
