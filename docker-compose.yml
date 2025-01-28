@@ -138,6 +138,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
       SERVER_ADDRESS: "0.0.0.0"
+      GATEWAY_BASE_URL: ${GATEWAY_BASE_URL}
     ports:
       - "8083:8083"
     depends_on:
