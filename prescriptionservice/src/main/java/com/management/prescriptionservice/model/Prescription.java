@@ -1,5 +1,6 @@
 package com.management.prescriptionservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.management.prescriptionservice.model.enums.PrescriptionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,10 @@ public class Prescription {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @OneToOne(mappedBy = "prescription")
+    @JsonIgnore
+    private Visit visit;
+
     @ElementCollection
     @CollectionTable(name = "prescription_medicines", joinColumns = @JoinColumn(name = "prescription_id"))
     private List<MedicineItem> medicines;
@@ -40,6 +45,10 @@ public class Prescription {
     @Enumerated(EnumType.STRING)
     private PrescriptionStatus status = PrescriptionStatus.CREATED;
 
-    // Other fields: createdAt, updatedAt
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }
 

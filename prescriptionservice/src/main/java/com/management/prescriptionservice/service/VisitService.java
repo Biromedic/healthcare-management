@@ -6,4 +6,6 @@ import com.management.prescriptionservice.model.Visit;
 public interface VisitService {
     Visit createVisit(String doctorId, String patientTC);
     VisitDTO getVisitDetails(Long visitId);
+
+    Visit saveOrUpdate(Visit visit);
 }

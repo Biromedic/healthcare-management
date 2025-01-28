@@ -22,7 +22,7 @@ public class VisitServiceImpl implements VisitService {
     public Visit createVisit(String doctorId, String patientTC) {
         Visit visit = new Visit();
         visit.setDoctorId(doctorId);
-        visit.setPatientTC(patientTC);
+        visit.setPatientTc(patientTC);
         visit.setVisitDateTime(LocalDateTime.now());
         return visitRepository.save(visit);
     }
@@ -32,5 +32,10 @@ public class VisitServiceImpl implements VisitService {
         Visit visit = visitRepository.findById(visitId)
                 .orElseThrow(() -> new ResourceNotFoundException("Visit not found with id: " + visitId));
         return modelMapper.map(visit, VisitDTO.class);
+    }
+
+    @Override
+    public Visit saveOrUpdate(Visit visit) {
+        return visitRepository.save(visit);
     }
 }
