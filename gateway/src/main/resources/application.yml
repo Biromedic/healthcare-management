@@ -10,7 +10,7 @@ spring:
         corsConfigurations:
           '[/**]':
             allowedOrigins: 
-              - "http://localhost:3000"
+              - "https://healthcare-management-frontend.vercel.app/login"
               - "http://localhost:8080"
             allowedMethods:
               - GET
